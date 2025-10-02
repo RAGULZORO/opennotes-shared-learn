@@ -18,50 +18,68 @@ export type Database = {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          category: string | null
           created_at: string | null
+          department: string | null
           description: string | null
           file_path: string
           file_size: number | null
           file_type: string
           id: string
+          question_paper_year: string | null
+          semester: number | null
           status: string
           subject: string | null
           tags: string[] | null
           title: string
+          unit: string | null
           updated_at: string | null
           uploaded_by: string | null
+          year: number | null
         }
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          category?: string | null
           created_at?: string | null
+          department?: string | null
           description?: string | null
           file_path: string
           file_size?: number | null
           file_type: string
           id?: string
+          question_paper_year?: string | null
+          semester?: number | null
           status?: string
           subject?: string | null
           tags?: string[] | null
           title: string
+          unit?: string | null
           updated_at?: string | null
           uploaded_by?: string | null
+          year?: number | null
         }
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          category?: string | null
           created_at?: string | null
+          department?: string | null
           description?: string | null
           file_path?: string
           file_size?: number | null
           file_type?: string
           id?: string
+          question_paper_year?: string | null
+          semester?: number | null
           status?: string
           subject?: string | null
           tags?: string[] | null
           title?: string
+          unit?: string | null
           updated_at?: string | null
           uploaded_by?: string | null
+          year?: number | null
         }
         Relationships: []
       }

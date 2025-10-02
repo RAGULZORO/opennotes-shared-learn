@@ -13,7 +13,13 @@ interface PendingNote {
   id: string;
   title: string;
   description: string | null;
+  category: string;
   subject: string | null;
+  unit: string | null;
+  year: number | null;
+  semester: number | null;
+  department: string | null;
+  question_paper_year: string | null;
   tags: string[] | null;
   file_path: string;
   file_type: string;
@@ -192,8 +198,26 @@ export default function Admin() {
                     )}
                     
                     <div className="flex flex-wrap gap-2">
+                      {note.category && (
+                        <Badge variant="secondary">
+                          {note.category === 'study_material' ? 'Study Material' : 
+                           note.category === 'question_paper' ? 'Question Paper' : 'Lab Manual'}
+                        </Badge>
+                      )}
                       {note.subject && (
                         <Badge variant="outline">Subject: {note.subject}</Badge>
+                      )}
+                      {note.department && (
+                        <Badge variant="outline">Dept: {note.department}</Badge>
+                      )}
+                      {note.year && note.semester && (
+                        <Badge variant="outline">Year {note.year} • Sem {note.semester}</Badge>
+                      )}
+                      {note.unit && (
+                        <Badge variant="outline">{note.unit}</Badge>
+                      )}
+                      {note.question_paper_year && (
+                        <Badge variant="outline">{note.question_paper_year} Paper</Badge>
                       )}
                       {note.tags?.map((tag, idx) => (
                         <Badge key={idx} variant="outline">{tag}</Badge>

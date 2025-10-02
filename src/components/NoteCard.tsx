@@ -9,7 +9,13 @@ interface NoteCardProps {
   id: string;
   title: string;
   description: string | null;
+  category: string;
   subject: string | null;
+  unit: string | null;
+  year: number | null;
+  semester: number | null;
+  department: string | null;
+  question_paper_year: string | null;
   tags: string[] | null;
   file_path: string;
   file_type: string;
@@ -19,7 +25,13 @@ interface NoteCardProps {
 export default function NoteCard({
   title,
   description,
+  category,
   subject,
+  unit,
+  year,
+  semester,
+  department,
+  question_paper_year,
   tags,
   file_path,
   file_type,
@@ -55,17 +67,35 @@ export default function NoteCard({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-xl">{title}</CardTitle>
-            {subject && (
-              <Badge variant="secondary" className="mt-2">
-                {subject}
-              </Badge>
-            )}
+            <div className="flex flex-wrap gap-2 mt-2">
+              {subject && (
+                <Badge variant="secondary">
+                  {subject}
+                </Badge>
+              )}
+              {department && (
+                <Badge variant="outline">
+                  {department}
+                </Badge>
+              )}
+            </div>
           </div>
           <FileText className="h-6 w-6 text-primary" />
         </div>
         {description && (
           <CardDescription className="mt-2">{description}</CardDescription>
         )}
+        <div className="flex flex-wrap gap-2 mt-2 text-sm text-muted-foreground">
+          {year && semester && (
+            <span>Year {year} • Sem {semester}</span>
+          )}
+          {unit && (
+            <span>• {unit}</span>
+          )}
+          {question_paper_year && (
+            <span>• {question_paper_year} Paper</span>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between">

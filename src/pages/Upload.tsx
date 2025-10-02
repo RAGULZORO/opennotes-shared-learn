@@ -15,14 +15,28 @@ import { z } from 'zod';
 const uploadSchema = z.object({
   title: z.string().trim().min(3, 'Title must be at least 3 characters').max(200),
   description: z.string().trim().max(1000).optional(),
-  subject: z.string().trim().max(100).optional(),
+  category: z.enum(['study_material', 'question_paper', 'lab_manual'], {
+    required_error: 'Please select a category',
+  }),
+  subject: z.string().trim().min(1, 'Subject is required').max(100),
+  unit: z.string().trim().max(50).optional(),
+  year: z.number().min(1).max(4, 'Year must be between 1 and 4'),
+  semester: z.number().min(1).max(8, 'Semester must be between 1 and 8'),
+  department: z.string().trim().min(1, 'Department is required').max(100),
+  question_paper_year: z.string().trim().max(50).optional(),
   tags: z.string().trim().max(500).optional(),
 });
 
 export default function Upload() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState<'study_material' | 'question_paper' | 'lab_manual' | ''>('');
   const [subject, setSubject] = useState('');
+  const [unit, setUnit] = useState('');
+  const [year, setYear] = useState('');
+  const [semester, setSemester] = useState('');
+  const [department, setDepartment] = useState('');
+  const [questionPaperYear, setQuestionPaperYear] = useState('');
   const [tags, setTags] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -70,7 +84,13 @@ export default function Upload() {
     const validation = uploadSchema.safeParse({
       title,
       description,
+      category,
       subject,
+      unit: unit || undefined,
+      year: parseInt(year),
+      semester: parseInt(semester),
+      department,
+      question_paper_year: questionPaperYear || undefined,
       tags,
     });
 
@@ -99,7 +119,13 @@ export default function Upload() {
       const { error: insertError } = await supabase.from('notes').insert({
         title,
         description: description || null,
-        subject: subject || null,
+        category,
+        subject,
+        unit: unit || null,
+        year: parseInt(year),
+        semester: parseInt(semester),
+        department,
+        question_paper_year: questionPaperYear || null,
         tags: tagsArray.length > 0 ? tagsArray : null,
         file_path: fileName,
         file_type: fileExt || 'unknown',
@@ -114,7 +140,13 @@ export default function Upload() {
       
       setTitle('');
       setDescription('');
+      setCategory('');
       setSubject('');
+      setUnit('');
+      setYear('');
+      setSemester('');
+      setDepartment('');
+      setQuestionPaperYear('');
       setTags('');
       setFile(null);
       
@@ -184,15 +216,107 @@ export default function Upload() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Subject</Label>
+                  <Label htmlFor="category">Category *</Label>
+                  <select
+                    id="category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value as any)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    required
+                  >
+                    <option value="">Select category</option>
+                    <option value="study_material">Study Material</option>
+                    <option value="question_paper">Question Paper</option>
+                    <option value="lab_manual">Lab Manual</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="subject">Subject Name *</Label>
                   <Input
                     id="subject"
                     type="text"
                     placeholder="e.g., Mathematics"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
+                    required
                   />
                 </div>
+
+                {category === 'study_material' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="unit">Unit</Label>
+                    <Input
+                      id="unit"
+                      type="text"
+                      placeholder="e.g., Unit 1, Unit 2"
+                      value={unit}
+                      onChange={(e) => setUnit(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                {category && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="year">Year *</Label>
+                      <select
+                        id="year"
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        required
+                      >
+                        <option value="">Select year</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="semester">Semester *</Label>
+                      <select
+                        id="semester"
+                        value={semester}
+                        onChange={(e) => setSemester(e.target.value)}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        required
+                      >
+                        <option value="">Select semester</option>
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                          <option key={sem} value={sem}>{sem}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="department">Department *</Label>
+                      <Input
+                        id="department"
+                        type="text"
+                        placeholder="e.g., Computer Science, Mechanical"
+                        value={department}
+                        onChange={(e) => setDepartment(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+
+                {category === 'question_paper' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="question_paper_year">Question Paper Year</Label>
+                    <Input
+                      id="question_paper_year"
+                      type="text"
+                      placeholder="e.g., 2023, 2022"
+                      value={questionPaperYear}
+                      onChange={(e) => setQuestionPaperYear(e.target.value)}
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="tags">Tags (comma separated)</Label>
