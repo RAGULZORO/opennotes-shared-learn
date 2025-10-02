@@ -32,10 +32,13 @@ export default function Admin() {
 
   useEffect(() => {
     if (!authLoading) {
-      if (!user || userRole !== 'admin') {
+      if (!user) {
+        navigate('/');
+        toast.error('Please sign in to access this page');
+      } else if (userRole && userRole !== 'admin') {
         navigate('/');
         toast.error('Admin access required');
-      } else {
+      } else if (userRole === 'admin') {
         fetchPendingNotes();
       }
     }
