@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, FileText, ExternalLink, Trash2 } from 'lucide-react';
+import { Check, X, FileText, ExternalLink, Trash2, Users } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
@@ -32,9 +32,18 @@ interface PendingNote {
   } | null;
 }
 
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  created_at: string;
+}
+
 export default function Admin() {
   const [pendingNotes, setPendingNotes] = useState<PendingNote[]>([]);
   const [approvedNotes, setApprovedNotes] = useState<PendingNote[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -50,6 +59,7 @@ export default function Admin() {
       } else if (userRole === 'admin') {
         fetchPendingNotes();
         fetchApprovedNotes();
+        fetchUsers();
       }
     }
   }, [user, userRole, authLoading, navigate]);
@@ -123,6 +133,21 @@ export default function Admin() {
     } catch (error) {
       toast.error('Failed to load approved notes');
       console.error('Error fetching approved notes:', error);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (error) {
+      toast.error('Failed to load users');
+      console.error('Error fetching users:', error);
     }
   };
 
@@ -236,12 +261,15 @@ export default function Admin() {
           </p>
 
           <Tabs defaultValue="pending" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="pending">
                 Pending ({pendingNotes.length})
               </TabsTrigger>
               <TabsTrigger value="approved">
                 Approved ({approvedNotes.length})
+              </TabsTrigger>
+              <TabsTrigger value="users">
+                Users ({users.length})
               </TabsTrigger>
             </TabsList>
 
@@ -433,6 +461,55 @@ export default function Admin() {
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="users">
+              {users.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No users registered</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-6">
+                  <p className="text-muted-foreground">
+                    {users.length} registered {users.length === 1 ? 'user' : 'users'}
+                  </p>
+                  
+                  <div className="grid gap-4">
+                    {users.map((userProfile) => (
+                      <Card key={userProfile.id} className="shadow-soft">
+                        <CardContent className="pt-6">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <span className="text-primary font-semibold">
+                                    {userProfile.name.charAt(0).toUpperCase()}
+                                  </span>
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-lg">{userProfile.name}</h3>
+                                  <p className="text-sm text-muted-foreground">{userProfile.email}</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2 items-center">
+                              <Badge variant={userProfile.role === 'admin' ? 'default' : 'secondary'}>
+                                {userProfile.role.charAt(0).toUpperCase() + userProfile.role.slice(1)}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                Joined {new Date(userProfile.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </div>
               )}
             </TabsContent>
