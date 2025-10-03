@@ -92,11 +92,11 @@ export default function Browse() {
           </p>
 
           <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-8">
-              <TabsTrigger value="all">All Notes</TabsTrigger>
-              <TabsTrigger value="study_material">Study Material</TabsTrigger>
-              <TabsTrigger value="question_paper">Question Papers</TabsTrigger>
-              <TabsTrigger value="lab_manual">Lab Manuals</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-8">
+              <TabsTrigger value="all" className="text-xs sm:text-sm">All Notes</TabsTrigger>
+              <TabsTrigger value="study_material" className="text-xs sm:text-sm">Study Material</TabsTrigger>
+              <TabsTrigger value="question_paper" className="text-xs sm:text-sm">Question Papers</TabsTrigger>
+              <TabsTrigger value="lab_manual" className="text-xs sm:text-sm">Lab Manuals</TabsTrigger>
             </TabsList>
 
             <TabsContent value={activeCategory} className="space-y-8">
@@ -128,7 +128,7 @@ export default function Browse() {
                   <p className="text-muted-foreground mb-4">
                     Found {filteredNotes.length} {filteredNotes.length === 1 ? 'note' : 'notes'}
                   </p>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {filteredNotes.map((note) => (
                       <NoteCard key={note.id} {...note} />
                     ))}

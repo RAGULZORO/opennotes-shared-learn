@@ -62,11 +62,11 @@ export default function NoteCard({
   };
 
   return (
-    <Card className="bg-gradient-card shadow-soft hover:shadow-elevated transition-all duration-300">
-      <CardHeader>
+    <Card className="bg-gradient-card shadow-soft hover:shadow-elevated transition-all duration-300 flex flex-col h-full">
+      <CardHeader className="flex-grow">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-xl">{title}</CardTitle>
+            <CardTitle className="text-base sm:text-xl">{title}</CardTitle>
             <div className="flex flex-wrap gap-2 mt-2">
               {subject && (
                 <Badge variant="secondary">
@@ -97,8 +97,8 @@ export default function NoteCard({
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-between">
+      <CardContent className="flex-shrink-0">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2">
             {tags && tags.map((tag, idx) => (
               <Badge key={idx} variant="outline" className="text-xs">
@@ -110,9 +110,9 @@ export default function NoteCard({
               {file_type}
             </Badge>
           </div>
-          <Button onClick={handleDownload} size="sm" className="gap-2">
+          <Button onClick={handleDownload} size="sm" className="gap-2 w-full sm:w-auto">
             <Download className="h-4 w-4" />
-            Download
+            <span>Download</span>
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-4">

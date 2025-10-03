@@ -159,9 +159,9 @@ export default function Admin() {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
+          <h1 className="text-2xl sm:text-4xl font-bold mb-2">Admin Dashboard</h1>
           <p className="text-muted-foreground mb-8">
             Review and approve pending note uploads
           </p>
@@ -225,20 +225,21 @@ export default function Admin() {
                       <Badge variant="outline">{note.file_type}</Badge>
                     </div>
 
-                    <div className="flex gap-2 pt-4">
+                     <div className="flex flex-wrap gap-2 pt-4">
                       <Button
                         onClick={() => viewFile(note.file_path)}
                         variant="outline"
                         size="sm"
-                        className="gap-2"
+                        className="gap-2 flex-1 sm:flex-none"
                       >
                         <ExternalLink className="h-4 w-4" />
-                        View File
+                        <span className="hidden sm:inline">View File</span>
+                        <span className="sm:hidden">View</span>
                       </Button>
                       <Button
                         onClick={() => handleApprove(note.id)}
                         size="sm"
-                        className="gap-2"
+                        className="gap-2 flex-1 sm:flex-none"
                       >
                         <Check className="h-4 w-4" />
                         Approve
@@ -247,7 +248,7 @@ export default function Admin() {
                         onClick={() => handleReject(note.id, note.file_path)}
                         variant="destructive"
                         size="sm"
-                        className="gap-2"
+                        className="gap-2 flex-1 sm:flex-none"
                       >
                         <X className="h-4 w-4" />
                         Reject
