@@ -20,9 +20,11 @@ interface NoteCardProps {
   file_path: string;
   file_type: string;
   created_at: string;
+  download_count: number;
 }
 
 export default function NoteCard({
+  id,
   title,
   description,
   category,
@@ -36,6 +38,7 @@ export default function NoteCard({
   file_path,
   file_type,
   created_at,
+  download_count,
 }: NoteCardProps) {
   const handleDownload = async () => {
     try {
@@ -53,6 +56,15 @@ export default function NoteCard({
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      
+      // Increment download count in background
+      supabase
+        .from('notes')
+        .update({ download_count: download_count + 1 })
+        .eq('id', id)
+        .then(({ error: updateError }) => {
+          if (updateError) console.error('Failed to update download count:', updateError);
+        });
       
       toast.success('Download started!');
     } catch (error) {
@@ -115,9 +127,17 @@ export default function NoteCard({
             <span>Download</span>
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-4">
-          Uploaded {new Date(created_at).toLocaleDateString()}
-        </p>
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-xs text-muted-foreground">
+            Uploaded {new Date(created_at).toLocaleDateString()}
+          </p>
+          {download_count > 0 && (
+            <Badge variant="secondary" className="text-xs gap-1">
+              <Download className="h-3 w-3" />
+              {download_count}
+            </Badge>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

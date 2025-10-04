@@ -22,6 +22,7 @@ export type Database = {
           created_at: string | null
           department: string | null
           description: string | null
+          download_count: number
           file_path: string
           file_size: number | null
           file_type: string
@@ -44,6 +45,7 @@ export type Database = {
           created_at?: string | null
           department?: string | null
           description?: string | null
+          download_count?: number
           file_path: string
           file_size?: number | null
           file_type: string
@@ -66,6 +68,7 @@ export type Database = {
           created_at?: string | null
           department?: string | null
           description?: string | null
+          download_count?: number
           file_path?: string
           file_size?: number | null
           file_type?: string

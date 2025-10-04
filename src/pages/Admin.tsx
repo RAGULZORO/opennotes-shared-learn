@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, FileText, ExternalLink, Trash2, Users } from 'lucide-react';
+import { Check, X, FileText, ExternalLink, Trash2, Users, BarChart, TrendingUp, Clock, Download } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,6 +26,7 @@ interface PendingNote {
   file_type: string;
   created_at: string;
   approved_at?: string | null;
+  download_count?: number;
   profiles: {
     name: string;
     email: string;
@@ -44,6 +45,7 @@ export default function Admin() {
   const [pendingNotes, setPendingNotes] = useState<PendingNote[]>([]);
   const [approvedNotes, setApprovedNotes] = useState<PendingNote[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [recentActivity, setRecentActivity] = useState(0);
   const [loading, setLoading] = useState(true);
   const { user, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -60,6 +62,7 @@ export default function Admin() {
         fetchPendingNotes();
         fetchApprovedNotes();
         fetchUsers();
+        fetchRecentActivity();
       }
     }
   }, [user, userRole, authLoading, navigate]);
@@ -148,6 +151,24 @@ export default function Admin() {
     } catch (error) {
       toast.error('Failed to load users');
       console.error('Error fetching users:', error);
+    }
+  };
+
+  const fetchRecentActivity = async () => {
+    try {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const { count, error } = await supabase
+        .from('notes')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'approved')
+        .gte('approved_at', sevenDaysAgo.toISOString());
+
+      if (error) throw error;
+      setRecentActivity(count || 0);
+    } catch (error) {
+      console.error('Error fetching recent activity:', error);
     }
   };
 
@@ -259,6 +280,58 @@ export default function Admin() {
           <p className="text-muted-foreground mb-8">
             Manage and review notes
           </p>
+
+          {/* Statistics Dashboard */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Notes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <p className="text-2xl font-bold">{approvedNotes.length}</p>
+                  <FileText className="h-8 w-8 text-primary opacity-50" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Pending Reviews</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <p className="text-2xl font-bold">{pendingNotes.length}</p>
+                  <Clock className="h-8 w-8 text-primary opacity-50" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <p className="text-2xl font-bold">{users.length}</p>
+                  <Users className="h-8 w-8 text-primary opacity-50" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <p className="text-2xl font-bold">{recentActivity}</p>
+                  <TrendingUp className="h-8 w-8 text-primary opacity-50" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Last 7 days</p>
+              </CardContent>
+            </Card>
+          </div>
 
           <Tabs defaultValue="pending" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-8">
@@ -431,6 +504,12 @@ export default function Admin() {
                             <Badge key={idx} variant="outline">{tag}</Badge>
                           ))}
                           <Badge variant="outline">{note.file_type}</Badge>
+                          {note.download_count !== undefined && note.download_count > 0 && (
+                            <Badge variant="secondary" className="gap-1">
+                              <Download className="h-3 w-3" />
+                              {note.download_count} downloads
+                            </Badge>
+                          )}
                         </div>
 
                         <div className="flex flex-wrap gap-2 pt-4">

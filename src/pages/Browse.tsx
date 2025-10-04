@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, X } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Navbar from '@/components/Navbar';
 import NoteCard from '@/components/NoteCard';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,12 +24,17 @@ interface Note {
   file_path: string;
   file_type: string;
   created_at: string;
+  download_count: number;
 }
 
 export default function Browse() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
+  const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedSemester, setSelectedSemester] = useState<string>('all');
+  const [departments, setDepartments] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +51,10 @@ export default function Browse() {
 
       if (error) throw error;
       setNotes(data || []);
+      
+      // Extract unique departments
+      const uniqueDepts = Array.from(new Set(data?.map(note => note.department).filter(Boolean))) as string[];
+      setDepartments(uniqueDepts.sort());
     } catch (error) {
       toast.error('Failed to load notes');
       console.error('Error fetching notes:', error);
@@ -59,7 +70,7 @@ export default function Browse() {
 
   const filteredNotes = filterNotesByCategory(activeCategory).filter((note) => {
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesSearch = (
       note.title.toLowerCase().includes(query) ||
       note.description?.toLowerCase().includes(query) ||
       note.subject?.toLowerCase().includes(query) ||
@@ -69,7 +80,20 @@ export default function Browse() {
       note.tags?.some(tag => tag.toLowerCase().includes(query)) ||
       note.file_type.toLowerCase().includes(query)
     );
+
+    const matchesDepartment = selectedDepartment === 'all' || note.department === selectedDepartment;
+    const matchesYear = selectedYear === 'all' || note.year?.toString() === selectedYear;
+    const matchesSemester = selectedSemester === 'all' || note.semester?.toString() === selectedSemester;
+
+    return matchesSearch && matchesDepartment && matchesYear && matchesSemester;
   });
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setSelectedDepartment('all');
+    setSelectedYear('all');
+    setSelectedSemester('all');
+  };
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
@@ -99,7 +123,7 @@ export default function Browse() {
               <TabsTrigger value="lab_manual" className="text-xs sm:text-sm">Lab Manuals</TabsTrigger>
             </TabsList>
 
-            <TabsContent value={activeCategory} className="space-y-8">
+            <TabsContent value={activeCategory} className="space-y-6">
               {/* Search Bar */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
@@ -110,6 +134,55 @@ export default function Browse() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 py-6 text-lg"
                 />
+              </div>
+
+              {/* Advanced Filters */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectValue placeholder="Department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Departments</SelectItem>
+                    {departments.map(dept => (
+                      <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger className="w-full sm:w-[160px]">
+                    <SelectValue placeholder="Year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Years</SelectItem>
+                    <SelectItem value="1">Year 1</SelectItem>
+                    <SelectItem value="2">Year 2</SelectItem>
+                    <SelectItem value="3">Year 3</SelectItem>
+                    <SelectItem value="4">Year 4</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={selectedSemester} onValueChange={setSelectedSemester}>
+                  <SelectTrigger className="w-full sm:w-[160px]">
+                    <SelectValue placeholder="Semester" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Semesters</SelectItem>
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
+                      <SelectItem key={sem} value={sem.toString()}>Semester {sem}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Button 
+                  variant="outline" 
+                  onClick={clearFilters}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Clear Filters
+                </Button>
               </div>
 
               {/* Notes Grid */}
