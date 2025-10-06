@@ -28,6 +28,7 @@ export type Database = {
           file_type: string
           id: string
           question_paper_year: string | null
+          rejection_reason: string | null
           semester: number | null
           status: string
           subject: string | null
@@ -51,6 +52,7 @@ export type Database = {
           file_type: string
           id?: string
           question_paper_year?: string | null
+          rejection_reason?: string | null
           semester?: number | null
           status?: string
           subject?: string | null
@@ -74,6 +76,7 @@ export type Database = {
           file_type?: string
           id?: string
           question_paper_year?: string | null
+          rejection_reason?: string | null
           semester?: number | null
           status?: string
           subject?: string | null

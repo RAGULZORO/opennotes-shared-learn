@@ -30,9 +30,14 @@ export default function Navbar() {
       </Link>
       
       {(userRole === 'staff' || userRole === 'admin') && (
-        <Link to="/upload">
-          <Button variant="ghost">Upload</Button>
-        </Link>
+        <>
+          <Link to="/upload">
+            <Button variant="ghost">Upload</Button>
+          </Link>
+          <Link to="/dashboard">
+            <Button variant="ghost">My Dashboard</Button>
+          </Link>
+        </>
       )}
       
       {userRole === 'admin' && (

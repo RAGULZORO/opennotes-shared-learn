@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Check, X, FileText, ExternalLink, Trash2, Users, BarChart, TrendingUp, Clock, Download } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navbar from '@/components/Navbar';
@@ -47,6 +48,7 @@ export default function Admin() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [recentActivity, setRecentActivity] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [rejectionReasons, setRejectionReasons] = useState<{[key: string]: string}>({});
   const { user, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -195,6 +197,12 @@ export default function Admin() {
   };
 
   const handleReject = async (noteId: string, filePath: string) => {
+    const reason = rejectionReasons[noteId];
+    if (!reason || reason.trim() === '') {
+      toast.error('Please provide a rejection reason');
+      return;
+    }
+
     try {
       const { error: deleteError } = await supabase.storage
         .from('notes')
@@ -204,12 +212,20 @@ export default function Admin() {
 
       const { error: updateError } = await supabase
         .from('notes')
-        .update({ status: 'rejected' })
+        .update({ 
+          status: 'rejected',
+          rejection_reason: reason 
+        })
         .eq('id', noteId);
 
       if (updateError) throw updateError;
 
-      toast.success('Note rejected and removed');
+      toast.success('Note rejected');
+      setRejectionReasons(prev => {
+        const updated = {...prev};
+        delete updated[noteId];
+        return updated;
+      });
       fetchPendingNotes();
     } catch (error) {
       toast.error('Failed to reject note');
@@ -406,34 +422,46 @@ export default function Admin() {
                           <Badge variant="outline">{note.file_type}</Badge>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 pt-4">
-                          <Button
-                            onClick={() => viewFile(note.file_path)}
-                            variant="outline"
-                            size="sm"
-                            className="gap-2 flex-1 sm:flex-none"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                            <span className="hidden sm:inline">View File</span>
-                            <span className="sm:hidden">View</span>
-                          </Button>
-                          <Button
-                            onClick={() => handleApprove(note.id)}
-                            size="sm"
-                            className="gap-2 flex-1 sm:flex-none"
-                          >
-                            <Check className="h-4 w-4" />
-                            Approve
-                          </Button>
-                          <Button
-                            onClick={() => handleReject(note.id, note.file_path)}
-                            variant="destructive"
-                            size="sm"
-                            className="gap-2 flex-1 sm:flex-none"
-                          >
-                            <X className="h-4 w-4" />
-                            Reject
-                          </Button>
+                        <div className="space-y-3 pt-4">
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              onClick={() => viewFile(note.file_path)}
+                              variant="outline"
+                              size="sm"
+                              className="gap-2 flex-1 sm:flex-none"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              <span className="hidden sm:inline">View File</span>
+                              <span className="sm:hidden">View</span>
+                            </Button>
+                            <Button
+                              onClick={() => handleApprove(note.id)}
+                              size="sm"
+                              className="gap-2 flex-1 sm:flex-none"
+                            >
+                              <Check className="h-4 w-4" />
+                              Approve
+                            </Button>
+                            <Button
+                              onClick={() => handleReject(note.id, note.file_path)}
+                              variant="destructive"
+                              size="sm"
+                              className="gap-2 flex-1 sm:flex-none"
+                            >
+                              <X className="h-4 w-4" />
+                              Reject
+                            </Button>
+                          </div>
+                          <Input
+                            type="text"
+                            placeholder="Rejection reason (required to reject)..."
+                            value={rejectionReasons[note.id] || ''}
+                            onChange={(e) => setRejectionReasons(prev => ({
+                              ...prev,
+                              [note.id]: e.target.value
+                            }))}
+                            className="w-full"
+                          />
                         </div>
 
                         <p className="text-xs text-muted-foreground">

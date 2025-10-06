@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, X } from 'lucide-react';
+import { Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Navbar from '@/components/Navbar';
@@ -35,6 +35,8 @@ export default function Browse() {
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedSemester, setSelectedSemester] = useState<string>('all');
   const [departments, setDepartments] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -90,10 +92,23 @@ export default function Browse() {
 
   const clearFilters = () => {
     setSearchQuery('');
+    setActiveCategory('all');
     setSelectedDepartment('all');
     setSelectedYear('all');
     setSelectedSemester('all');
+    setCurrentPage(1);
   };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredNotes.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedNotes = filteredNotes.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeCategory, selectedDepartment, selectedYear, selectedSemester]);
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
@@ -202,10 +217,60 @@ export default function Browse() {
                     Found {filteredNotes.length} {filteredNotes.length === 1 ? 'note' : 'notes'}
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {filteredNotes.map((note) => (
+                    {paginatedNotes.map((note) => (
                       <NoteCard key={note.id} {...note} />
                     ))}
                   </div>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-8">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Previous
+                      </Button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                          if (
+                            page === 1 ||
+                            page === totalPages ||
+                            (page >= currentPage - 1 && page <= currentPage + 1)
+                          ) {
+                            return (
+                              <Button
+                                key={page}
+                                variant={currentPage === page ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setCurrentPage(page)}
+                                className="w-10"
+                              >
+                                {page}
+                              </Button>
+                            );
+                          } else if (page === currentPage - 2 || page === currentPage + 2) {
+                            return <span key={page} className="px-2">...</span>;
+                          }
+                          return null;
+                        })}
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  )}
                 </>
               )}
             </TabsContent>
