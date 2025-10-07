@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Check, X, FileText, ExternalLink, Trash2, Users, BarChart, TrendingUp, Clock, Download } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navbar from '@/components/Navbar';
+import RoleManagement from '@/components/RoleManagement';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -350,7 +351,7 @@ export default function Admin() {
           </div>
 
           <Tabs defaultValue="pending" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsList className="grid w-full grid-cols-4 mb-8">
               <TabsTrigger value="pending">
                 Pending ({pendingNotes.length})
               </TabsTrigger>
@@ -359,6 +360,9 @@ export default function Admin() {
               </TabsTrigger>
               <TabsTrigger value="users">
                 Users ({users.length})
+              </TabsTrigger>
+              <TabsTrigger value="roles">
+                Role Management
               </TabsTrigger>
             </TabsList>
 
@@ -619,6 +623,10 @@ export default function Admin() {
                   </div>
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="roles">
+              <RoleManagement />
             </TabsContent>
           </Tabs>
         </div>

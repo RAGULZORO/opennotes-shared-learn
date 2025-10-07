@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, FileType } from 'lucide-react';
+import { Download, FileText, FileType, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import PDFPreviewDialog from './PDFPreviewDialog';
 
 interface NoteCardProps {
   id: string;
@@ -40,6 +42,20 @@ export default function NoteCard({
   created_at,
   download_count,
 }: NoteCardProps) {
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
+
+  const isPDF = file_type.toLowerCase() === 'pdf' || file_type.toLowerCase() === 'application/pdf';
+
+  const handlePreview = () => {
+    const { data } = supabase.storage
+      .from('notes')
+      .getPublicUrl(file_path);
+    
+    setPreviewUrl(data.publicUrl);
+    setPreviewOpen(true);
+  };
+
   const handleDownload = async () => {
     try {
       const { data, error } = await supabase.storage
@@ -122,10 +138,18 @@ export default function NoteCard({
               {file_type}
             </Badge>
           </div>
-          <Button onClick={handleDownload} size="sm" className="gap-2 w-full sm:w-auto">
-            <Download className="h-4 w-4" />
-            <span>Download</span>
-          </Button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            {isPDF && (
+              <Button onClick={handlePreview} size="sm" variant="outline" className="gap-2 flex-1 sm:flex-initial">
+                <Eye className="h-4 w-4" />
+                <span>Preview</span>
+              </Button>
+            )}
+            <Button onClick={handleDownload} size="sm" className="gap-2 flex-1 sm:flex-initial">
+              <Download className="h-4 w-4" />
+              <span>Download</span>
+            </Button>
+          </div>
         </div>
         <div className="flex items-center justify-between mt-4">
           <p className="text-xs text-muted-foreground">
@@ -139,6 +163,17 @@ export default function NoteCard({
           )}
         </div>
       </CardContent>
+
+      <PDFPreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        fileUrl={previewUrl}
+        fileName={file_path.split('/').pop() || title}
+        onDownload={() => {
+          setPreviewOpen(false);
+          handleDownload();
+        }}
+      />
     </Card>
   );
 }
