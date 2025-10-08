@@ -8,6 +8,7 @@ import { Check, X, FileText, ExternalLink, Trash2, Users, BarChart, TrendingUp, 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Navbar from '@/components/Navbar';
 import RoleManagement from '@/components/RoleManagement';
+import NotificationBell from '@/components/NotificationBell';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -293,10 +294,16 @@ export default function Admin() {
       
       <div className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl sm:text-4xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground mb-8">
-            Manage and review notes
-          </p>
+          <div className="flex items-start justify-between mb-2">
+            <div>
+              <h1 className="text-2xl sm:text-4xl font-bold">Admin Dashboard</h1>
+              <p className="text-muted-foreground mt-2">
+                Manage and review notes
+              </p>
+            </div>
+            <NotificationBell />
+          </div>
+          <div className="mb-8" />
 
           {/* Statistics Dashboard */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

@@ -116,7 +116,7 @@ export default function Upload() {
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0);
 
-      const { error: insertError } = await supabase.from('notes').insert({
+      const { data: noteData, error: insertError } = await supabase.from('notes').insert({
         title,
         description: description || null,
         category,
@@ -132,9 +132,18 @@ export default function Upload() {
         file_size: file.size,
         uploaded_by: user?.id,
         status: 'pending',
-      });
+      }).select().single();
 
       if (insertError) throw insertError;
+
+      // Create notification for admins
+      if (noteData) {
+        await supabase.from('notifications').insert({
+          user_id: user?.id,
+          note_id: noteData.id,
+          message: `New note uploaded: "${title}" by ${user?.email}`,
+        });
+      }
 
       toast.success('Note uploaded successfully! Waiting for admin approval.');
       
