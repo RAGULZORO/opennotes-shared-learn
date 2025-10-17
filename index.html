@@ -10,15 +10,17 @@
     <meta property="og:title" content="OpenNotes - Free Academic Note Sharing" />
     <meta property="og:description" content="Access thousands of verified academic notes and study materials for free" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <!-- Inline SVG favicon as data URI to avoid browser requesting /favicon.ico first and flashing another icon -->
+    <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect x='6' y='8' width='40' height='48' rx='4' ry='4' fill='%23ffffff' stroke='%231f2937' stroke-width='2'/><rect x='46' y='8' width='12' height='48' rx='2' ry='2' fill='%23f97316' stroke='%23e65b00' stroke-width='1'/><line x1='12' y1='18' x2='42' y2='18' stroke='%236b7280' stroke-width='2' stroke-linecap='round'/></svg>">
+    <!-- External SVG/ICO fallbacks served from public root -->
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/note-favicon.svg">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
   </head>
-
+    
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/bootstrap/main.tsx"></script>
   </body>
 </html>

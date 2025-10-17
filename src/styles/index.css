@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Copied from client/core/index.css - keep ownership in client until full migration */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 84% 5%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 84% 5%;
+  }
+}
+
+body {
+  @apply bg-background text-foreground;
+}

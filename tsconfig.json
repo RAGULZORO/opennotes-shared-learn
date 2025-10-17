@@ -4,7 +4,13 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/client/*": ["./client/*"],
+      "@/modules/*": ["./client/modules/*"],
+  "@/modules": ["./client/modules"],
+      "@/ui-kit/*": ["./client/ui-kit/*"],
+  "@/layout/*": ["./client/layout/*"],
+      "@/integrations/*": ["./server/*"]
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,
