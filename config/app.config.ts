@@ -1,4 +1,4 @@
-import { ROUTES, USER_ROLES, NOTE_CATEGORIES, NOTE_STATUS } from '../src/shared/constants';
+import { ROUTES, USER_ROLES, NOTE_CATEGORIES, NOTE_STATUS } from '../client/shared/constants';
 
 export const appConfig = {
   name: 'OpenNotes',
