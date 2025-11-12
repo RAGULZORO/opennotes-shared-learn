@@ -1,7 +1,7 @@
 import React from "react";
-import { Toaster } from "../../client/ui-kit/atoms/toaster";
-import { Toaster as Sonner } from "../../client/ui-kit/atoms/sonner";
-import { TooltipProvider } from "../../client/ui-kit/atoms/tooltip";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
