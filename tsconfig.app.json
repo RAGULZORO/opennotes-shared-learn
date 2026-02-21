@@ -23,10 +23,18 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./client/*"],
+      "@/components/*": ["./client/components/*"],
+      "@/lib/*": ["./client/shared/*"],
+      "@/modules/*": ["./client/modules/*"],
+      "@/layout/*": ["./client/layout/*"],
+      "@/ui-kit/*": ["./client/ui-kit/*"],
+      "@/hooks/*": ["./client/shared/hooks/*"],
+      "@/integrations/*": ["./src/integrations/*"],
       "@/server/*": ["./server/*"],
-      "@/config/*": ["./config/*"]
+      "@/config/*": ["./config/*"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["client", "config"]
+  "include": ["client", "src", "config"]
 }
