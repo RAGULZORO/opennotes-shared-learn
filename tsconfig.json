@@ -4,13 +4,17 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/client/*": ["./client/*"],
+      "@/components/*": ["./client/components/*"],
+      "@/lib/*": ["./client/shared/*"],
       "@/modules/*": ["./client/modules/*"],
-  "@/modules": ["./client/modules"],
+      "@/layout/*": ["./client/layout/*"],
       "@/ui-kit/*": ["./client/ui-kit/*"],
-  "@/layout/*": ["./client/layout/*"],
-      "@/integrations/*": ["./server/*"]
+      "@/hooks/*": ["./client/shared/hooks/*"],
+      "@/integrations/*": ["./src/integrations/*"],
+      "@/server/*": ["./server/*"],
+      "@/config/*": ["./config/*"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/*": ["./src/*"]
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,
